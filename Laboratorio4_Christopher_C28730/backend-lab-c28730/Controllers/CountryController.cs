@@ -22,5 +22,20 @@ namespace backend_lab_c28730.Controllers
       var countries = countryService.GetCountries();
       return countries;
     }
+
+    [HttpPost]
+    public async Task<ActionResult<bool>> CreateCountry(CountryModel country)
+    {
+      if (country == null) {
+        return BadRequest();
+      }
+
+      var result = countryService.CreateCountry(country);
+      if (string.IsNullOrEmpty(result)) {
+        return Ok(result);
+      } else {
+        return BadRequest();
+      }
+    }
   }
 }

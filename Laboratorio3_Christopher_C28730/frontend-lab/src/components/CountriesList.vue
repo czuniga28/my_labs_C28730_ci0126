@@ -1,4 +1,6 @@
 <script>
+import axios from 'axios';
+
 export default {
   name: 'CountriesList',
   data() {
@@ -12,10 +14,20 @@ export default {
       ],
     };
   },
+  created() {
+    this.getCountries();
+  },
   methods: {
     eliminar(index) {
       this.countries.splice(index, 1);
     },
+    getCountries() {
+      axios.get("http://localhost:5011/api/Country").then(
+        (response) => {
+          this.countries = response.data;
+        }
+      ) 
+    }
   },
 }
 </script>
@@ -47,6 +59,15 @@ export default {
         </tr>
       </tbody>
     </table>
+  </div>
+  <div class="row justify-content-end">
+    <div class="col-2">
+      <a href="/country">
+        <button type="button" class="btn btn-outline-secondary float-right">
+          Agregar país
+        </button>
+      </a>
+    </div>
   </div>
 </template>
 

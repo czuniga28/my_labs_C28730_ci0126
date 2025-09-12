@@ -16,5 +16,19 @@ namespace backend_lab_c28730.Services
     {
         return countryRepository.GetCountries();
     }
+
+    public string CreateCountry(CountryModel country)
+    {
+      var result = string.Empty;
+      try {
+        var isCreated = countryRepository.CreateCountry(country);
+        if (!isCreated) {
+          result = "error al crear el pais";
+        }
+      } catch (Exception) {
+        result = "error al crear el pais";
+      }
+      return result;
+    }
   }
 }
