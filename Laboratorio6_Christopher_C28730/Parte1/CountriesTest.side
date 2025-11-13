@@ -1,0 +1,118 @@
+{
+  "id": "c6a5f4a7-9e8a-4b8d-8f3a-2b5c8e9f1a3d",
+  "version": "2.0",
+  "name": "CountriesTest",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "CountriesTest",
+    "commands": [{
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567891",
+      "comment": "Navegar a la página principal",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567892",
+      "comment": "ASSERT 1: Verificar que el título de la página existe",
+      "command": "assertElementPresent",
+      "target": "css=h1",
+      "targets": [
+        ["css=h1", "css:finder"],
+        ["xpath=//h1", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567893",
+      "comment": "ASSERT 2: Verificar el texto exacto del título",
+      "command": "assertText",
+      "target": "css=h1",
+      "targets": [
+        ["css=h1", "css:finder"],
+        ["xpath=//h1", "xpath:position"]
+      ],
+      "value": "Lista de países"
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567894",
+      "comment": "ASSERT 3: Verificar que la tabla existe",
+      "command": "assertElementPresent",
+      "target": "css=.table",
+      "targets": [
+        ["css=.table", "css:finder"],
+        ["xpath=//table", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567895",
+      "comment": "ASSERT 4: Verificar que hay al menos 5 filas en la tabla (incluyendo header)",
+      "command": "assertElementPresent",
+      "target": "xpath=//tbody/tr[5]",
+      "targets": [
+        ["xpath=//tbody/tr[5]", "xpath:position"],
+        ["css=tbody tr:nth-child(5)", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567896",
+      "comment": "ASSERT 5: Verificar que existe el botón 'Agregar país'",
+      "command": "assertElementPresent",
+      "target": "xpath=//button[contains(text(), 'Agregar país')]",
+      "targets": [
+        ["xpath=//button[contains(text(), 'Agregar país')]", "xpath:position"],
+        ["css=button.btn-outline-secondary", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567898",
+      "comment": "ASSERT 6: Verificar que existe al menos un país 'Costa Rica' en la tabla",
+      "command": "assertText",
+      "target": "xpath=//td[contains(text(), 'Costa Rica')]",
+      "targets": [
+        ["xpath=//td[contains(text(), 'Costa Rica')]", "xpath:position"],
+        ["css=td", "css:finder"]
+      ],
+      "value": "Costa Rica"
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567899",
+      "comment": "Interactuar: Hacer clic en el primer botón Eliminar",
+      "command": "click",
+      "target": "xpath=(//button[contains(text(), 'Eliminar')])[1]",
+      "targets": [
+        ["xpath=(//button[contains(text(), 'Eliminar')])[1]", "xpath:position"],
+        ["css=.btn-danger", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567900",
+      "comment": "ASSERT 7: Verificar que 'Costa Rica' ya no existe después de eliminar",
+      "command": "assertElementNotPresent",
+      "target": "xpath=//td[contains(text(), 'Costa Rica')]",
+      "targets": [
+        ["xpath=//td[contains(text(), 'Costa Rica')]", "xpath:position"],
+        ["css=td", "css:finder"]
+      ],
+      "value": ""
+    }, {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567901",
+      "comment": "ASSERT 8: Verificar que el botón Editar existe y tiene la clase correcta",
+      "command": "assertElementPresent",
+      "target": "css=.btn-secondary",
+      "targets": [
+        ["css=.btn-secondary", "css:finder"],
+        ["xpath=//button[contains(@class, 'btn-secondary')]", "xpath:position"]
+      ],
+      "value": ""
+  }]
+  }],
+  "suites": [{
+    "id": "suite-1",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["a1b2c3d4-e5f6-7890-abcd-ef1234567890"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}
