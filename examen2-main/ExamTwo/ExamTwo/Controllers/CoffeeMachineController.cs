@@ -1,107 +1,93 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ExamTwo.Const;
+using ExamTwo.DTOs;
+using ExamTwo.Models;
+using ExamTwo.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ExamTwo.Controllers
 {
-    public class CoffeeMachineController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class CoffeeMachineController : ControllerBase
     {
+        private readonly ICoffeeMachineService _coffeeMachineService;
 
-        private readonly Database _db;
-
-        public CoffeeMachineController(Database db)
+        public CoffeeMachineController(ICoffeeMachineService coffeeMachineService)
         {
-            _db = db;
+            _coffeeMachineService = coffeeMachineService;
         }
 
-        [HttpGet("getCoffees")]
-        public ActionResult<Dictionary<string, int>> GetCoffeePrices()
+        [HttpGet("coffees")]
+        public ActionResult<List<CoffeeTypeDto>> GetAvailableCoffees()
         {
-            return Ok(_db.keyValues);
-        }
-
-        [HttpGet("getCoffeePricesInCents")]
-        public ActionResult<Dictionary<string, int>> GetCoffeePricesInCents()
-        {
-            return Ok(_db.keyValues2);
-        }
-
-        [HttpGet("getQuantity")]
-        public ActionResult<Dictionary<string, int>> GetQuantity()
-        {
-            return Ok(_db.keyValues3);
-        }
-
-        [HttpPost("buyCoffee")]
-        public ActionResult<string> BuyCoffee([FromBody] OrderRequest request)
-        {
-            if (request.Order == null || request.Order.Count == 0)
-                return BadRequest("Ordem vacia.");
-
-            if (request.Payment.TotalAmount <= 0)
-                return BadRequest("Dinero insuficiente ");
-
             try
             {
-                var costoTotal = request.Order.Sum(o => _db.keyValues2.First(c => c.Key == o.Key).Value * o.Value);
+                var coffees = _coffeeMachineService.GetAvailableCoffees();
+                return Ok(coffees);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(Constants.HTTP_STATUS_INTERNAL_SERVER_ERROR, 
+                    string.Format(Constants.ErrorMessages.ERROR_GET_COFFEES, ex.Message));
+            }
+        }
 
-                if (request.Payment.TotalAmount < costoTotal)
-                { 
-                    return BadRequest("Dinero insuficiente ");
-                }
+        [HttpPost("calculate-total")]
+        public ActionResult<int> CalculateTotal([FromBody] Dictionary<string, int> order)
+        {
+            try
+            {
+                if (order == null || order.Count == Constants.ZERO)
+                    return BadRequest(Constants.ErrorMessages.ORDER_EMPTY);
 
+                var total = _coffeeMachineService.CalculateTotalCost(order);
+                return Ok(total);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(Constants.HTTP_STATUS_INTERNAL_SERVER_ERROR, 
+                    string.Format(Constants.ErrorMessages.ERROR_CALCULATE_TOTAL, ex.Message));
+            }
+        }
 
-                foreach (var cafe in request.Order)
+        [HttpPost("purchase")]
+        public ActionResult<PurchaseResultDto> ProcessPurchase([FromBody] OrderRequestDto request)
+        {
+            try
+            {
+                if (request == null)
+                    return BadRequest(Constants.ErrorMessages.REQUEST_NULL);
+
+                if (request.Order == null || request.Order.Count == Constants.ZERO)
+                    return BadRequest(Constants.ErrorMessages.ORDER_EMPTY);
+
+                if (request.Payment == null)
+                    return BadRequest(Constants.ErrorMessages.PAYMENT_NULL);
+
+                var payment = new Payment
                 {
-                    var selected = _db.keyValues.First(c => c.Key == cafe.Key).Key;
-                    if (cafe.Value > _db.keyValues[selected])
-                    {
-                        return $"No hay suficientes {selected} en la máquina.";
-                    }
-                    _db.keyValues[selected] -= cafe.Value;
-                }
+                    TotalAmount = request.Payment.TotalAmount,
+                    Coins = request.Payment.Coins ?? new List<int>(),
+                    Bills = request.Payment.Bills ?? new List<int>()
+                };
 
-                var change = request.Payment.TotalAmount - costoTotal;
-                String result = $"Su vuelto es de: {change} colones. Desglose:";
+                var result = _coffeeMachineService.ProcessPurchase(request.Order, payment);
 
-                foreach (var coin in _db.keyValues3.Keys.OrderByDescending(c => c))
+                if (!result.Success)
                 {
-                    var count = Math.Min(change / coin, _db.keyValues3[coin]);
-                    if (count > 0)
-                    {
-                        result +=  $" {count} moneda de {coin},  ";              
-                        change -= coin * count;
-                    }
-                }
-
-
-                if (change > 0)
-                {
-                    return StatusCode(500, "No hay suficiente cambio en la máquina.");
+                    return BadRequest(result);
                 }
 
                 return Ok(result);
             }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
             catch (Exception ex)
             {
-                return StatusCode(500, ex.Message);
+                return StatusCode(Constants.HTTP_STATUS_INTERNAL_SERVER_ERROR, new PurchaseResultDto
+                {
+                    Success = false,
+                    Message = string.Format(Constants.ErrorMessages.ERROR_PROCESS_PURCHASE, ex.Message)
+                });
             }
         }
-    }
-
-    public class OrderRequest
-    {
-        public Dictionary<string, int> Order { get; set; }
-        public Payment Payment { get; set; }
-    }
-
-    public class Payment
-    {
-        public int TotalAmount { get; set; }
-        public List<int> Coins { get; set; }
-        public List<int> Bills { get; set; }
     }
 }

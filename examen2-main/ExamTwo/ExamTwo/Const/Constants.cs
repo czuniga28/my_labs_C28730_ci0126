@@ -2,10 +2,23 @@ namespace ExamTwo.Const
 {
     public static class Constants
     {
+        // HTTP Status Codes
+        public const int HTTP_STATUS_INTERNAL_SERVER_ERROR = 500;
+
         // Numeric Constants
         public const int ZERO = 0;
         public const int MIN_QUANTITY = 0;
 
+        // Error Messages - Controller
+        public static class ErrorMessages
+        {
+            public const string ERROR_GET_COFFEES = "Error al obtener los cafés disponibles: {0}";
+            public const string ERROR_CALCULATE_TOTAL = "Error al calcular el total: {0}";
+            public const string ERROR_PROCESS_PURCHASE = "Error al procesar la compra: {0}";
+            public const string REQUEST_NULL = "La solicitud no puede estar vacía.";
+            public const string ORDER_EMPTY = "La orden no puede estar vacía.";
+            public const string PAYMENT_NULL = "El pago no puede estar vacío.";
+        }
 
         // Error Messages - Service
         public static class ServiceErrorMessages
